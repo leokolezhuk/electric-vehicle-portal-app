@@ -1,15 +1,14 @@
 import EventBus from "@/helpers/EventBus";
 import VehicleData from "@/models/VehicleData";
+import { throttle } from "lodash";
 
 const MESSAGE_EVENT = "message-received";
 
 class ViricityWebSocket {
-  private url!: string;
   private socket!: WebSocket;
   private stream!: EventBus;
 
   constructor(url: string) {
-    this.url = url;
     this.socket = new WebSocket(url);
     this.socket.onopen = () => {
       console.log("Connection to WebSocket Succesful");
@@ -27,7 +26,7 @@ class ViricityWebSocket {
   private handleSocketMessage(data: string) {
     console.log("Received message");
     const vehicleData = VehicleData.parseJSON(data);
-
+    if (vehicleData === null) return;
     this.stream.emit(MESSAGE_EVENT, vehicleData);
   }
 

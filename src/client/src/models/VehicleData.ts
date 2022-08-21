@@ -24,18 +24,34 @@ export default class VehicleData {
   speedKmh!: number;
   batteryCharge!: number;
 
-  public static parseJSON(jsonData: string): VehicleData {
-    const rawData = JSON.parse(jsonData);
+  public static parseJSON(jsonData: string): VehicleData | null {
+    try {
+      const rawData = JSON.parse(jsonData);
 
-    const gpsData = rawData.gps.split("|", 2);
+      this.validateData(rawData);
+      const gpsData = rawData.gps.split("|", 2);
 
-    return new VehicleData(
-      new Date(rawData.time),
-      parseFloat(rawData.energy),
-      new GPSCoordinate(parseFloat(gpsData[0]), parseFloat(gpsData[1])),
-      parseFloat(rawData.odo),
-      parseFloat(rawData.speed),
-      parseFloat(rawData.soc)
-    );
+      return new VehicleData(
+        new Date(rawData.time),
+        parseFloat(rawData.energy),
+        new GPSCoordinate(parseFloat(gpsData[0]), parseFloat(gpsData[1])),
+        parseFloat(rawData.odo),
+        parseFloat(rawData.speed),
+        parseFloat(rawData.soc)
+      );
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  private static validateData(rawDataObj: { [x: string]: unknown }) {
+    const expectedProps = ["time", "energy", "gps", "odo", "speed", "soc"];
+    expectedProps.forEach((propName: string) => {
+      const propValue = rawDataObj[propName];
+      if (propValue === null || propValue === undefined || propValue === "") {
+        throw new Error(`Invalid vehicle data: property ${propName} not set.`);
+      }
+    });
   }
 }
