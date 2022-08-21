@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "prod": "vue-cli-service serve --mode production",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
@@ -14,6 +15,8 @@
     "@mdi/js": "^7.0.96",
     "apexcharts": "^3.35.4",
     "core-js": "^3.8.3",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
     "roboto-fontface": "*",
     "scriptjs": "^2.5.9",
     "tiny-emitter": "^2.1.0",
