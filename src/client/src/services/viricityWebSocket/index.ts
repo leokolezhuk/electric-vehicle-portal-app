@@ -10,21 +10,17 @@ class ViricityWebSocket {
 
   constructor(url: string) {
     this.socket = new WebSocket(url);
-    this.socket.onopen = () => {
-      console.log("Connection to WebSocket Succesful");
-    };
-    this.socket.onmessage = ({ data }) => {
+    this.socket.onmessage = throttle(({ data }) => {
       this.handleSocketMessage(data);
-    };
+    }, 1000);
     this.socket.onerror = (error) => {
-      console.log(`Error on WebSocket connection: ${error}`);
+      console.error(`Error on WebSocket connection: ${error}`);
     };
 
     this.stream = new EventBus();
   }
 
   private handleSocketMessage(data: string) {
-    console.log("Received message");
     const vehicleData = VehicleData.parseJSON(data);
     if (vehicleData === null) return;
     this.stream.emit(MESSAGE_EVENT, vehicleData);
