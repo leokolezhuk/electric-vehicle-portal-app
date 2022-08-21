@@ -1,40 +1,44 @@
 <template>
   <v-container>
     <div v-if="vehicleData">
-      <v-row wrap no-gutters>
-        <v-col cols="12" md="6">
-          <VehicleMap
-            :gps-location="vehicleData?.coordinate"
-            style="height: 500px"
-          />
-        </v-col>
-        <v-col cols="12" md="6">
-          <v-row>
-            <v-col>
-              <OdometerIndicator :value="vehicleData.odometerKm" />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="6" lg="4">
-              <CircularIndicator
-                id="vehicle-speed"
-                :value="vehicleData.speedKmh"
-                label="SPEED"
-                units="km/h"
-                :value-formatter="formatSpeed"
-              />
-            </v-col>
-            <v-col cols="6" lg="4">
-              <CircularIndicator
-                id="vehicle-charge"
-                :value="vehicleData.batteryCharge"
-                label="CHARGE"
-                units="%"
-                :value-formatter="formatBatteryCharge"
-              />
-            </v-col>
-          </v-row>
-        </v-col>
+      <v-card class="rounded-lg elevation-23">
+        <v-row wrap no-gutters>
+          <v-col cols="12" md="6">
+            <VehicleMap
+              :gps-location="vehicleData?.coordinate"
+              style="height: 500px"
+            />
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-row class="pt-6 px-6">
+              <v-col>
+                <OdometerIndicator :value="vehicleData.odometerKm" />
+              </v-col>
+            </v-row>
+            <v-row class="px-3">
+              <v-col cols="6" lg="4">
+                <CircularIndicator
+                  id="vehicle-speed"
+                  :value="vehicleData.speedKmh"
+                  label="SPEED"
+                  units="km/h"
+                  :value-formatter="formatSpeed"
+                />
+              </v-col>
+              <v-col cols="6" lg="4">
+                <CircularIndicator
+                  id="vehicle-charge"
+                  :value="vehicleData.batteryCharge"
+                  label="CHARGE"
+                  units="%"
+                  :value-formatter="formatBatteryCharge"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-card>
+      <v-row class="mt-12">
         <v-col cols="12">
           <v-row>
             <v-col cols="12" lg="6">

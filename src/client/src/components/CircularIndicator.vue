@@ -12,6 +12,7 @@ var baseOptions = {
   chart: {
     height: 250,
     type: "radialBar",
+    offsetX: -5,
     offsetY: 0,
   },
   plotOptions: {
@@ -118,8 +119,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .circular-indicator {
-  height: 250px;
-  width: 250px;
+  height: 200px;
+  width: 200px;
   position: relative;
 }
 </style>
