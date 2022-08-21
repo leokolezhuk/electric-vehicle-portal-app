@@ -30,7 +30,7 @@ class Broadcaster extends EventEmitter {
 						setTimeout(() => {
 							this.emit("data", obj)
 							cb()
-						}, Math.ceil(Math.random() * 1000))
+						}, Math.ceil(Math.random() * 150))
 					}
 				}))
 				.once("finish", () => {
