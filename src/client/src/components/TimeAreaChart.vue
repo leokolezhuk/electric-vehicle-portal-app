@@ -11,6 +11,19 @@ var baseOptions = {
   chart: {
     height: 350,
     type: "area",
+    toolbar: {
+      show: false,
+      tools: {
+        download: false,
+        selection: false,
+        zoom: false,
+        zoomin: false,
+        zoomout: false,
+        pan: false,
+        reset: false,
+        customIcons: [],
+      },
+    },
   },
   dataLabels: {
     enabled: false,
@@ -22,6 +35,9 @@ var baseOptions = {
     type: "datetime",
   },
   tooltip: {
+    enabled: false,
+  },
+  selection: {
     enabled: false,
   },
 };
