@@ -1,16 +1,16 @@
 <template>
-  <hello-world />
+  <dashboard />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import HelloWorld from "../components/HelloWorld.vue";
+import Dashboard from "../components/Dashboard.vue";
 
 export default defineComponent({
   name: "HomeView",
 
   components: {
-    HelloWorld,
+    Dashboard,
   },
 });
 </script>
