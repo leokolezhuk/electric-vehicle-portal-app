@@ -1,67 +1,38 @@
 <template>
-  <GMapMap
-    :center="center"
-    :zoom="10"
-    map-type-id="terrain"
-    style="width: 100vw; height: 20rem"
-  >
-    <GMapCluster :zoomOnClick="true">
-      <GMapMarker
-        :key="index"
-        v-for="(m, index) in markers"
-        :position="m.position"
-        :clickable="true"
-        :draggable="true"
-        @click="center = m.position"
-      />
-    </GMapCluster>
-  </GMapMap>
+  <GoogleMap :coordinates="mapLocation" />
 </template>
 
 <script lang="ts">
 import GPSCoordinate from "@/models/GPSCoordinate";
+import { defineComponent } from "vue";
+import GoogleMap from "@/components/GoogleMap.vue";
 
-export default {
+interface MapLocation {
+  lng: number;
+  lat: number;
+}
+
+export default defineComponent({
   props: {
-    gpsLocation: Object as GPSCoordinate,
+    gpsLocation: { type: GPSCoordinate, required: true },
   },
 
-  data() {
-    return {
-      center: { lat: 51.093048, lng: 6.84212 },
-      markers: [
-        {
-          position: {
-            lat: 51.093048,
-            lng: 6.84212,
-          },
-        },
-        {
-          position: {
-            lat: 51.198429,
-            lng: 6.69529,
-          },
-        },
-        {
-          position: {
-            lat: 51.165218,
-            lng: 7.067116,
-          },
-        },
-        {
-          position: {
-            lat: 51.09256,
-            lng: 6.84074,
-          },
-        },
-      ],
-    };
+  components: { GoogleMap },
+
+  computed: {
+    mapLocation(): MapLocation {
+      return {
+        lat: this.gpsLocation.latitude,
+        lng: this.gpsLocation.longitude,
+      };
+    },
   },
-};
+});
 </script>
 
-<style>
-body {
-  margin: 0;
+<style lang="scss" scoped>
+.vehicle-map {
+  width: 500px;
+  height: 500px;
 }
 </style>
