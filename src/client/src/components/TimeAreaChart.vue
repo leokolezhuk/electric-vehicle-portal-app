@@ -70,6 +70,20 @@ export default defineComponent({
     makeChartOptions(): object {
       const options = {
         ...baseOptions,
+        title: {
+          text: this.label,
+          align: "left",
+          margin: 10,
+          offsetX: 0,
+          offsetY: 0,
+          floating: false,
+          style: {
+            fontSize: "32px",
+            fontWeight: "regular",
+            fontFamily: undefined,
+            color: "#9e9e9e",
+          },
+        },
         series: [{ name: this.label, data: this.series }],
       };
       return options;
