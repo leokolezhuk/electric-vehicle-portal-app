@@ -2,27 +2,22 @@
   <div :id="mapName" :class="`google-map`"></div>
 </template>
 
-<script lang="ts">
+<script>
 import $Scriptjs from "scriptjs";
 import { GOOGLE_MAPS_API_KEY } from "@/config";
-import { PropType } from "vue";
+import { defineComponent } from "vue";
 import { mdiBus } from "@mdi/js";
 
-interface MapLocation {
-  lng: number;
-  lat: number;
-}
-
-export default {
+export default defineComponent({
   props: {
     coordinates: {
-      type: Object as PropType<MapLocation>,
+      type: Object,
       required: true,
     },
     index: Number,
   },
 
-  data: function () {
+  data() {
     return {
       apiKey: GOOGLE_MAPS_API_KEY,
       mapName: `map${this.index || ""}`,
@@ -65,18 +60,18 @@ export default {
         },
       });
     },
-    setMarkerPosition(position: MapLocation) {
-      this.map.setCenter(position);
+    setMarkerPosition(position) {
+      this.map?.setCenter(position);
       this.marker?.setPosition(position);
     },
   },
 
   watch: {
-    coordinates(newVal: MapLocation) {
+    coordinates(newVal) {
       this.setMarkerPosition(newVal);
     },
   },
-};
+});
 </script>
 
 <style lang="scss">
