@@ -71,9 +71,10 @@ import OdometerIndicator from "@/components/OdometerIndicator.vue";
 import TimeAreaChart from "@/components/TimeAreaChart.vue";
 import viricityWebSocket from "@/services/viricityWebSocket";
 import DataEntry from "@/models/DataEntry";
+import moment from "moment";
 
 export default defineComponent({
-  name: "HelloWorld",
+  name: "VehicleDashboard",
 
   components: {
     VehicleMap,
@@ -93,7 +94,10 @@ export default defineComponent({
         this.chargeHistory = [];
       }
 
-      this.speedHistory.push({ x: data.time.toISOString(), y: data.speedKmh });
+      this.speedHistory.push({
+        x: data.time.toISOString(),
+        y: data.speedKmh,
+      });
       this.chargeHistory.push({
         x: data.time.toISOString(),
         y: data.energykWh,
@@ -125,6 +129,28 @@ export default defineComponent({
     formatSpeed(value: number) {
       const roundedSpeed = Math.round(value * 10) / 10;
       return `${roundedSpeed} km/h`;
+    },
+  },
+
+  computed: {
+    energyUsage(): string {
+      const numHistoryEntries = this.chargeHistory.length;
+      if (numHistoryEntries < 2) return "N/A";
+
+      const lastDataPoint = this.chargeHistory[numHistoryEntries - 1];
+      const firstDataPoint = this.chargeHistory[0];
+
+      const firstTimeStamp = new Date(firstDataPoint.x);
+      const lastTimeStamp = new Date(lastDataPoint.x);
+
+      const secondsDelta = moment(lastTimeStamp).diff(
+        firstTimeStamp,
+        "seconds"
+      );
+      const energyDelta = lastDataPoint.y - firstDataPoint.y;
+
+      const usage = energyDelta / (secondsDelta / 3600);
+      return usage.toString();
     },
   },
 });

@@ -1,16 +1,16 @@
 <template>
-  <dashboard />
+  <VehicleDashboard />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Dashboard from "../components/Dashboard.vue";
+import VehicleDashboard from "../components/VehicleDashboard.vue";
 
 export default defineComponent({
   name: "HomeView",
 
   components: {
-    Dashboard,
+    VehicleDashboard,
   },
 });
 </script>
