@@ -1,5 +1,5 @@
 <template>
-  <v-chip> Odometer: {{ value }} km </v-chip>
+  <v-chip prepend-icon="mdi-gauge"> Odometer: {{ value }} km </v-chip>
 </template>
 
 <script lang="ts">
