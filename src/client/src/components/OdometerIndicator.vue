@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="text-h6 text-grey">
+    <div class="text-h6 text-grey" title="Odometer reading">
       <v-icon class="mr-2">mdi-gauge</v-icon>
       <span>Odometer: {{ formattedValue }} km </span>
     </div>

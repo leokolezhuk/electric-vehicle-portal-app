@@ -7,6 +7,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
+const labelCssClass = "text-subtitle-1";
+const labelColor = "#9e9e9e";
 var baseOptions = {
   chart: {
     height: 350,
@@ -31,8 +33,30 @@ var baseOptions = {
   stroke: {
     curve: "smooth",
   },
+  yaxis: {
+    labels: {
+      show: true,
+    },
+    title: {
+      text: "Speed, km/h",
+      style: {
+        cssClass: "text-caption text-grey",
+      },
+    },
+  },
   xaxis: {
     type: "datetime",
+    labels: {
+      format: "HH:mm",
+      dateTimeUTC: false,
+    },
+    title: {
+      text: "Time",
+      style: {
+        color: labelColor,
+        cssClass: labelCssClass,
+      },
+    },
   },
   tooltip: {
     enabled: false,
@@ -58,6 +82,10 @@ export default defineComponent({
       required: true,
     },
     label: {
+      type: String,
+      required: true,
+    },
+    units: {
       type: String,
       required: true,
     },
@@ -99,6 +127,18 @@ export default defineComponent({
             fontWeight: "regular",
             fontFamily: undefined,
             color: "#9e9e9e",
+          },
+        },
+        yaxis: {
+          labels: {
+            show: true,
+          },
+          title: {
+            text: `${this.label} - ${this.units}`,
+            style: {
+              color: labelColor,
+              cssClass: labelCssClass,
+            },
           },
         },
         series: [{ name: this.label, data: this.series }],

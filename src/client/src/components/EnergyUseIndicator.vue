@@ -1,9 +1,10 @@
 <template>
-  <div>
-    <div class="text-h6 text-grey">
-      <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
-      <span>Energy consumption: {{ formattedValue }} kW/h</span>
-    </div>
+  <div
+    class="text-h6 text-grey"
+    title="Running average hourly energy consumption"
+  >
+    <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
+    <span>Energy consumption: {{ formattedValue }} kW/h</span>
   </div>
 </template>
 

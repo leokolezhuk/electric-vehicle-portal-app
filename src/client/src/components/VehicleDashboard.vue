@@ -43,8 +43,8 @@
           <v-divider />
           <v-row>
             <v-col>
-              <OdometerIndicator :value="vehicleData.odometerKm" class="ma-4" />
-              <EnergyUseIndicator :value="energyUsage" class="ma-4" />
+              <OdometerIndicator :value="vehicleData.odometerKm" class="my-4" />
+              <EnergyUseIndicator :value="energyUsage" class="my-4" />
             </v-col>
           </v-row>
         </v-col>
@@ -57,6 +57,7 @@
             <TimeAreaChart
               id="vehicle-speed-chart"
               label="Speed"
+              units="km/h"
               :series="speedHistory"
             />
           </v-col>
@@ -64,6 +65,7 @@
             <TimeAreaChart
               id="vehicle-charge-chart"
               label="Charge"
+              units="%"
               :series="chargeHistory"
             />
           </v-col>
