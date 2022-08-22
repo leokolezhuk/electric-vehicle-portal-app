@@ -2,27 +2,32 @@
   <div :id="mapName" :class="`google-map`"></div>
 </template>
 
-<script>
+<script lang="ts">
 import $Scriptjs from "scriptjs";
 import { GOOGLE_MAPS_API_KEY } from "@/config";
-import { defineComponent } from "vue";
+import { defineComponent, PropType, reactive, ref } from "vue";
 import { mdiBus } from "@mdi/js";
 
 export default defineComponent({
+  name: "VehicleLocation",
+
   props: {
-    coordinates: {
-      type: Object,
+    id: {
+      type: String,
       required: true,
     },
-    index: Number,
+    coordinate: {
+      type: Object as PropType<google.maps.LatLngLiteral>,
+      required: true,
+    },
   },
 
-  data() {
+  setup(props) {
     return {
       apiKey: GOOGLE_MAPS_API_KEY,
-      mapName: `map${this.index || ""}`,
-      map: null,
-      marker: null,
+      map: null as google.maps.Map | null,
+      marker: null as google.maps.Marker | null,
+      mapName: ref(`vehicle-location-` + props.id),
     };
   },
 
@@ -37,8 +42,8 @@ export default defineComponent({
 
   methods: {
     initializeMap() {
-      const element = document.getElementById(this.mapName);
-      const mapCentre = this.coordinates;
+      const element = document.getElementById(this.mapName) as HTMLElement;
+      const mapCentre = this.coordinate;
       const options = {
         center: new google.maps.LatLng(mapCentre.lat, mapCentre.lng),
         zoom: 15,
@@ -48,21 +53,21 @@ export default defineComponent({
 
       this.map = new google.maps.Map(element, options);
       this.marker = new google.maps.Marker({
-        position: this.coordinates,
+        position: this.coordinate,
         map: this.map,
         icon: {
           path: mdiBus,
-          fillColor: "blue",
+          fillColor: "#1E88E5",
           fillOpacity: 1,
           strokeWeight: 1,
           strokeColor: "blue",
-          scale: 1,
+          scale: 1.3,
         },
       });
     },
-    setMarkerPosition(position) {
+    setMarkerPosition(position: google.maps.LatLng) {
       const mapBounds = this.map?.getBounds();
-      if (!mapBounds.contains(position)) {
+      if (mapBounds !== undefined && !mapBounds.contains(position)) {
         this.map?.setCenter(position);
       }
       this.marker?.setPosition(position);
@@ -70,7 +75,7 @@ export default defineComponent({
   },
 
   watch: {
-    coordinates(newVal) {
+    coordinate(newVal: google.maps.LatLng) {
       this.setMarkerPosition(newVal);
     },
   },

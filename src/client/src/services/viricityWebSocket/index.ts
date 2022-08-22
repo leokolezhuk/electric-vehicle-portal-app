@@ -10,13 +10,12 @@ class ViricityWebSocket {
 
   constructor(url: string) {
     this.socket = new WebSocket(url);
-    this.socket.onmessage = throttle(({ data }) => {
+    this.socket.onmessage = ({ data }) => {
       this.handleSocketMessage(data);
-    }, 1000);
+    };
     this.socket.onerror = (error) => {
       console.error(`Error on WebSocket connection: ${error}`);
     };
-
     this.stream = new EventBus();
   }
 
@@ -26,8 +25,7 @@ class ViricityWebSocket {
     this.stream.emit(MESSAGE_EVENT, vehicleData);
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  public onMessage(handler: Function) {
+  public onMessage(handler: (data: VehicleData) => void) {
     this.stream.on(MESSAGE_EVENT, handler);
   }
 }

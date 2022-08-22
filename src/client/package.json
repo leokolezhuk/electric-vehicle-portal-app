@@ -27,7 +27,9 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
+    "@types/google.maps": "^3.49.2",
     "@types/jest": "^27.0.1",
+    "@types/scriptjs": "^0.0.2",
     "@types/webfontloader": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",

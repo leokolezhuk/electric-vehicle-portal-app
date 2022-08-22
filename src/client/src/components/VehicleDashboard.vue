@@ -1,82 +1,76 @@
 <template>
   <v-container>
-    <div v-if="vehicleData">
-      <v-card class="rounded-lg elevation-23">
-        <v-row wrap no-gutters>
-          <v-col cols="12" md="6">
-            <VehicleMap
-              :gps-location="vehicleData?.coordinate"
-              style="height: 500px"
-            />
-          </v-col>
-          <v-col cols="12" md="6" class="pa-6">
-            <v-row no-gutters>
-              <v-col>
-                <OdometerIndicator :value="vehicleData.odometerKm" />
-                <EnergyUseIndicator :value="energyUsage" />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                lg="4"
-                class="d-flex justify-center align-center justify-md-start"
-              >
-                <CircularIndicator
-                  id="vehicle-speed"
-                  :value="vehicleData.speedKmh"
-                  label="SPEED"
-                  units="km/h"
-                  :value-formatter="formatSpeed"
-                />
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                lg="4"
-                class="d-flex justify-center align-center justify-md-start"
-              >
-                <CircularIndicator
-                  id="vehicle-charge"
-                  :value="vehicleData.batteryCharge"
-                  label="CHARGE"
-                  units="%"
-                  :value-formatter="formatBatteryCharge"
-                />
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-card>
-      <v-row class="mt-12">
-        <v-col cols="12">
+    <v-card class="rounded-lg elevation-23">
+      <v-row wrap no-gutters>
+        <v-col cols="12" md="6">
+          <VehicleLocation :coordinate="mapLocation" style="height: 500px" />
+        </v-col>
+        <v-col cols="12" md="6" class="pa-6">
+          <v-row no-gutters>
+            <v-col>
+              <OdometerIndicator :value="vehicleData.odometerKm" />
+              <EnergyUseIndicator :value="energyUsage" />
+            </v-col>
+          </v-row>
           <v-row>
-            <v-col cols="12" lg="6">
-              <TimeAreaChart
-                id="vehicle-speed-chart"
-                label="Speed"
-                :series="speedHistory"
+            <v-col
+              cols="12"
+              sm="6"
+              lg="4"
+              class="d-flex justify-center align-center justify-md-start"
+            >
+              <CircularIndicator
+                id="vehicle-speed"
+                :value="vehicleData.speedKmh"
+                label="SPEED"
+                units="km/h"
+                :value-formatter="formatSpeed"
               />
             </v-col>
-            <v-col cols="12" lg="6">
-              <TimeAreaChart
-                id="vehicle-charge-chart"
-                label="Charge"
-                :series="chargeHistory"
+            <v-col
+              cols="12"
+              sm="6"
+              lg="4"
+              class="d-flex justify-center align-center justify-md-start"
+            >
+              <CircularIndicator
+                id="vehicle-charge"
+                :value="vehicleData.batteryCharge"
+                label="CHARGE"
+                units="%"
+                :value-formatter="formatBatteryCharge"
               />
             </v-col>
           </v-row>
         </v-col>
       </v-row>
-    </div>
+    </v-card>
+    <v-row class="mt-12">
+      <v-col cols="12">
+        <v-row>
+          <v-col cols="12" lg="6">
+            <TimeAreaChart
+              id="vehicle-speed-chart"
+              label="Speed"
+              :series="speedHistory"
+            />
+          </v-col>
+          <v-col cols="12" lg="6">
+            <TimeAreaChart
+              id="vehicle-charge-chart"
+              label="Charge"
+              :series="chargeHistory"
+            />
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import VehicleData from "@/models/VehicleData";
-import VehicleMap from "@/components/VehicleMap.vue";
 import CircularIndicator from "@/components/CircularIndicator.vue";
 import OdometerIndicator from "@/components/OdometerIndicator.vue";
 import EnergyUseIndicator from "@/components/EnergyUseIndicator.vue";
@@ -84,12 +78,29 @@ import TimeAreaChart from "@/components/TimeAreaChart.vue";
 import viricityWebSocket from "@/services/viricityWebSocket";
 import DataEntry from "@/models/DataEntry";
 import moment from "moment";
+import { DASHBOARD_UPDATE_EVERY_MS } from "@/config";
+import GPSCoordinate from "@/models/GPSCoordinate";
+import VehicleLocation from "@/components/VehicleLocation.vue";
+
+const dataPlaceholder = new VehicleData(
+  new Date(),
+  0,
+  new GPSCoordinate(0, 0),
+  0,
+  0,
+  0
+);
+const _data = {
+  vehicleData: dataPlaceholder,
+  speedHistory: [] as Array<DataEntry<string, number>>,
+  chargeHistory: [] as Array<DataEntry<string, number>>,
+};
 
 export default defineComponent({
   name: "VehicleDashboard",
 
   components: {
-    VehicleMap,
+    VehicleLocation,
     TimeAreaChart,
     CircularIndicator,
     OdometerIndicator,
@@ -98,35 +109,45 @@ export default defineComponent({
 
   mounted() {
     viricityWebSocket.onMessage((data: VehicleData) => {
-      this.vehicleData = data;
-
+      _data.vehicleData = data;
       if (data.time < this.getLastTimeStamp()) {
+        // Hack.
         // If the received vehicle data is timed before the last stored stamp,
-        // reset history.
-        this.speedHistory = [];
-        this.chargeHistory = [];
+        // reset history. This should only happen with cyclical test data.
+        _data.speedHistory = [];
+        _data.chargeHistory = [];
       }
-
-      this.speedHistory.push({
+      _data.speedHistory.push({
         x: data.time.toISOString(),
         y: data.speedKmh,
       });
-      this.chargeHistory.push({
+      _data.chargeHistory.push({
         x: data.time.toISOString(),
         y: data.energykWh,
       });
     });
+
+    setInterval(this.update, DASHBOARD_UPDATE_EVERY_MS);
   },
 
   data() {
     return {
-      vehicleData: null as VehicleData | null,
+      vehicleData: dataPlaceholder as VehicleData,
       speedHistory: [] as Array<DataEntry<string, number>>,
       chargeHistory: [] as Array<DataEntry<string, number>>,
     };
   },
 
   methods: {
+    update() {
+      this.vehicleData = _data.vehicleData;
+
+      this.speedHistory.length = 0;
+      this.speedHistory.push(..._data.speedHistory);
+
+      this.chargeHistory.length = 0;
+      this.chargeHistory.push(..._data.chargeHistory);
+    },
     getLastTimeStamp(): Date {
       if (this.speedHistory.length < 1) {
         return new Date(0);
@@ -162,16 +183,14 @@ export default defineComponent({
       );
       const energyDelta = lastDataPoint.y - firstDataPoint.y;
 
-      const usage = energyDelta / (secondsDelta / 3600);
-      return usage;
+      return energyDelta / (secondsDelta / 3600);
+    },
+    mapLocation(): google.maps.LatLngLiteral {
+      return {
+        lat: this.vehicleData?.coordinate.latitude,
+        lng: this.vehicleData?.coordinate.longitude,
+      };
     },
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.vehicle-map-container {
-  width: 500px;
-  height: 500px;
-}
-</style>
