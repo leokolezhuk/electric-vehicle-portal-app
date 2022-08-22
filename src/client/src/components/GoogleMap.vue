@@ -61,7 +61,10 @@ export default defineComponent({
       });
     },
     setMarkerPosition(position) {
-      this.map?.setCenter(position);
+      const mapBounds = this.map?.getBounds();
+      if (!mapBounds.contains(position)) {
+        this.map?.setCenter(position);
+      }
       this.marker?.setPosition(position);
     },
   },
@@ -80,11 +83,5 @@ export default defineComponent({
   height: 100%;
   margin: 0 auto;
   background: rgb(235, 235, 235);
-}
-
-#locations-map {
-  .gm-ui-hover-effect {
-    display: none !important;
-  }
 }
 </style>
