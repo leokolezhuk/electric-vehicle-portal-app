@@ -1,5 +1,10 @@
 <template>
-  <v-chip> Energy consumption: {{ formattedValue }} kW/h </v-chip>
+  <div>
+    <div class="text-h6 text-grey">
+      <v-icon class="mr-2">mdi-lightning-bolt</v-icon>
+      <span>Energy consumption: {{ formattedValue }} kW/h</span>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">

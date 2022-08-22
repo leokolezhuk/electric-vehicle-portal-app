@@ -1,5 +1,10 @@
 <template>
-  <v-chip prepend-icon="mdi-gauge"> Odometer: {{ formattedValue }} km </v-chip>
+  <div>
+    <div class="text-h6 text-grey">
+      <v-icon class="mr-2">mdi-gauge</v-icon>
+      <span>Odometer: {{ formattedValue }} km </span>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
