@@ -39,20 +39,11 @@ var baseOptions = {
       },
     },
   },
-  fill: {
-    type: "gradient",
-    gradient: {
-      shade: "dark",
-      shadeIntensity: 0.15,
-      inverseColors: false,
-      opacityFrom: 1,
-      opacityTo: 1,
-      stops: [0, 50, 65, 91],
-    },
-  },
+
   stroke: {
     dashArray: 4,
   },
+  colors: ["#1E88E5"],
 };
 
 export default defineComponent({

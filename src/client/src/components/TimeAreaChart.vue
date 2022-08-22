@@ -40,6 +40,7 @@ var baseOptions = {
   selection: {
     enabled: false,
   },
+  colors: ["#1E88E5"],
 };
 
 import { PropType } from "vue";
