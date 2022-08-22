@@ -86,6 +86,7 @@ import moment from "moment";
 import { DASHBOARD_UPDATE_EVERY_MS } from "@/config";
 import GPSCoordinate from "@/models/GPSCoordinate";
 import VehicleLocation from "@/components/VehicleLocation.vue";
+import { round } from "lodash";
 
 export default defineComponent({
   name: "VehicleDashboard",
@@ -171,12 +172,10 @@ export default defineComponent({
       return new Date(lastTimeStampStr);
     },
     formatBatteryCharge(value: number) {
-      const roundedCharge = Math.round(value * 10) / 10;
-      return `${roundedCharge} %`;
+      return `${round(value, 1)} %`;
     },
     formatSpeed(value: number) {
-      const roundedSpeed = Math.round(value * 10) / 10;
-      return `${roundedSpeed} km/h`;
+      return `${round(value, 0)} km/h`;
     },
   },
 
