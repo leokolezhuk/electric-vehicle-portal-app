@@ -175,8 +175,8 @@ export default defineComponent({
       const numHistoryEntries = this.chargeHistory.length;
       if (numHistoryEntries < 2) return 0;
 
-      const lastDataPoint = this.chargeHistory[numHistoryEntries - 1];
       const firstDataPoint = this.chargeHistory[0];
+      const lastDataPoint = this.chargeHistory[numHistoryEntries - 1];
 
       const firstTimeStamp = new Date(firstDataPoint.x);
       const lastTimeStamp = new Date(lastDataPoint.x);
