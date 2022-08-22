@@ -9,14 +9,20 @@
               style="height: 500px"
             />
           </v-col>
-          <v-col cols="12" md="6">
-            <v-row class="pt-6 px-6">
+          <v-col cols="12" md="6" class="pa-6">
+            <v-row no-gutters>
               <v-col>
                 <OdometerIndicator :value="vehicleData.odometerKm" />
+                <EnergyUseIndicator :value="energyUsage" />
               </v-col>
             </v-row>
-            <v-row class="px-3">
-              <v-col cols="6" lg="4">
+            <v-row>
+              <v-col
+                cols="12"
+                sm="6"
+                lg="4"
+                class="d-flex justify-center align-center justify-md-start"
+              >
                 <CircularIndicator
                   id="vehicle-speed"
                   :value="vehicleData.speedKmh"
@@ -25,7 +31,12 @@
                   :value-formatter="formatSpeed"
                 />
               </v-col>
-              <v-col cols="6" lg="4">
+              <v-col
+                cols="12"
+                sm="6"
+                lg="4"
+                class="d-flex justify-center align-center justify-md-start"
+              >
                 <CircularIndicator
                   id="vehicle-charge"
                   :value="vehicleData.batteryCharge"
@@ -68,6 +79,7 @@ import VehicleData from "@/models/VehicleData";
 import VehicleMap from "@/components/VehicleMap.vue";
 import CircularIndicator from "@/components/CircularIndicator.vue";
 import OdometerIndicator from "@/components/OdometerIndicator.vue";
+import EnergyUseIndicator from "@/components/EnergyUseIndicator.vue";
 import TimeAreaChart from "@/components/TimeAreaChart.vue";
 import viricityWebSocket from "@/services/viricityWebSocket";
 import DataEntry from "@/models/DataEntry";
@@ -81,6 +93,7 @@ export default defineComponent({
     TimeAreaChart,
     CircularIndicator,
     OdometerIndicator,
+    EnergyUseIndicator,
   },
 
   mounted() {
@@ -133,9 +146,9 @@ export default defineComponent({
   },
 
   computed: {
-    energyUsage(): string {
+    energyUsage(): number {
       const numHistoryEntries = this.chargeHistory.length;
-      if (numHistoryEntries < 2) return "N/A";
+      if (numHistoryEntries < 2) return 0;
 
       const lastDataPoint = this.chargeHistory[numHistoryEntries - 1];
       const firstDataPoint = this.chargeHistory[0];
@@ -150,7 +163,7 @@ export default defineComponent({
       const energyDelta = lastDataPoint.y - firstDataPoint.y;
 
       const usage = energyDelta / (secondsDelta / 3600);
-      return usage.toString();
+      return usage;
     },
   },
 });

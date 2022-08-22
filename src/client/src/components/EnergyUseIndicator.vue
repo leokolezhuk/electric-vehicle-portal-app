@@ -1,5 +1,5 @@
 <template>
-  <v-chip prepend-icon="mdi-gauge"> Odometer: {{ formattedValue }} km </v-chip>
+  <v-chip> Energy consumption: {{ formattedValue }} kW/h </v-chip>
 </template>
 
 <script lang="ts">
@@ -7,7 +7,7 @@ import { defineComponent } from "vue";
 import { round } from "lodash";
 
 export default defineComponent({
-  name: "OdometerIndicator",
+  name: "EnergyUseIndicator",
 
   props: {
     value: {
@@ -18,7 +18,7 @@ export default defineComponent({
 
   computed: {
     formattedValue() {
-      return round(this.value, 0);
+      return round(this.value, 1);
     },
   },
 });
