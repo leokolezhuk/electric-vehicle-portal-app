@@ -3,7 +3,11 @@
     <v-card class="rounded-lg elevation-23">
       <v-row wrap no-gutters>
         <v-col cols="12" md="6">
-          <VehicleLocation :coordinate="mapLocation" style="height: 500px" />
+          <VehicleLocation
+            id="vehicle-location"
+            :coordinate="mapLocation"
+            style="height: 500px"
+          />
         </v-col>
         <v-col cols="12" md="6" class="pa-6">
           <v-row no-gutters>
@@ -69,7 +73,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import VehicleData from "@/models/VehicleData";
 import CircularIndicator from "@/components/CircularIndicator.vue";
 import OdometerIndicator from "@/components/OdometerIndicator.vue";
@@ -81,20 +85,6 @@ import moment from "moment";
 import { DASHBOARD_UPDATE_EVERY_MS } from "@/config";
 import GPSCoordinate from "@/models/GPSCoordinate";
 import VehicleLocation from "@/components/VehicleLocation.vue";
-
-const dataPlaceholder = new VehicleData(
-  new Date(),
-  0,
-  new GPSCoordinate(0, 0),
-  0,
-  0,
-  0
-);
-const _data = {
-  vehicleData: dataPlaceholder,
-  speedHistory: [] as Array<DataEntry<string, number>>,
-  chargeHistory: [] as Array<DataEntry<string, number>>,
-};
 
 export default defineComponent({
   name: "VehicleDashboard",
@@ -109,19 +99,19 @@ export default defineComponent({
 
   mounted() {
     viricityWebSocket.onMessage((data: VehicleData) => {
-      _data.vehicleData = data;
+      this.dirtyData.vehicleData = data;
       if (data.time < this.getLastTimeStamp()) {
         // Hack.
         // If the received vehicle data is timed before the last stored stamp,
         // reset history. This should only happen with cyclical test data.
-        _data.speedHistory = [];
-        _data.chargeHistory = [];
+        this.dirtyData.speedHistory = [];
+        this.dirtyData.chargeHistory = [];
       }
-      _data.speedHistory.push({
+      this.dirtyData.speedHistory.push({
         x: data.time.toISOString(),
         y: data.speedKmh,
       });
-      _data.chargeHistory.push({
+      this.dirtyData.chargeHistory.push({
         x: data.time.toISOString(),
         y: data.energykWh,
       });
@@ -130,23 +120,37 @@ export default defineComponent({
     setInterval(this.update, DASHBOARD_UPDATE_EVERY_MS);
   },
 
-  data() {
+  setup() {
+    const dataPlaceholder = new VehicleData(
+      new Date(),
+      0,
+      new GPSCoordinate(0, 0),
+      0,
+      0,
+      0
+    );
+
     return {
-      vehicleData: dataPlaceholder as VehicleData,
-      speedHistory: [] as Array<DataEntry<string, number>>,
-      chargeHistory: [] as Array<DataEntry<string, number>>,
+      dirtyData: {
+        vehicleData: dataPlaceholder,
+        speedHistory: [] as Array<DataEntry<string, number>>,
+        chargeHistory: [] as Array<DataEntry<string, number>>,
+      },
+      vehicleData: ref(dataPlaceholder),
+      speedHistory: ref([] as Array<DataEntry<string, number>>),
+      chargeHistory: ref([] as Array<DataEntry<string, number>>),
     };
   },
 
   methods: {
     update() {
-      this.vehicleData = _data.vehicleData;
+      this.vehicleData = this.dirtyData.vehicleData;
 
       this.speedHistory.length = 0;
-      this.speedHistory.push(..._data.speedHistory);
+      this.speedHistory.push(...this.dirtyData.speedHistory);
 
       this.chargeHistory.length = 0;
-      this.chargeHistory.push(..._data.chargeHistory);
+      this.chargeHistory.push(...this.dirtyData.chargeHistory);
     },
     getLastTimeStamp(): Date {
       if (this.speedHistory.length < 1) {
