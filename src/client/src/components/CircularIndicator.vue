@@ -39,7 +39,6 @@ var baseOptions = {
       },
     },
   },
-
   stroke: {
     dashArray: 4,
   },

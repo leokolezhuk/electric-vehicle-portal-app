@@ -10,18 +10,12 @@
           />
         </v-col>
         <v-col cols="12" md="6" class="pa-6">
-          <v-row no-gutters>
-            <v-col>
-              <OdometerIndicator :value="vehicleData.odometerKm" />
-              <EnergyUseIndicator :value="energyUsage" />
-            </v-col>
-          </v-row>
           <v-row>
             <v-col
               cols="12"
               sm="6"
-              lg="4"
-              class="d-flex justify-center align-center justify-md-start"
+              lg="6"
+              class="d-flex justify-center align-center"
             >
               <CircularIndicator
                 id="vehicle-speed"
@@ -34,8 +28,8 @@
             <v-col
               cols="12"
               sm="6"
-              lg="4"
-              class="d-flex justify-center align-center justify-md-start"
+              lg="6"
+              class="d-flex justify-center align-center"
             >
               <CircularIndicator
                 id="vehicle-charge"
@@ -44,6 +38,13 @@
                 units="%"
                 :value-formatter="formatBatteryCharge"
               />
+            </v-col>
+          </v-row>
+          <v-divider />
+          <v-row>
+            <v-col>
+              <OdometerIndicator :value="vehicleData.odometerKm" class="ma-4" />
+              <EnergyUseIndicator :value="energyUsage" class="ma-4" />
             </v-col>
           </v-row>
         </v-col>
@@ -113,6 +114,10 @@ export default defineComponent({
       });
       this.dirtyData.chargeHistory.push({
         x: data.time.toISOString(),
+        y: data.batteryCharge,
+      });
+      this.dirtyData.energyHistory.push({
+        x: data.time.toISOString(),
         y: data.energykWh,
       });
     });
@@ -135,10 +140,12 @@ export default defineComponent({
         vehicleData: dataPlaceholder,
         speedHistory: [] as Array<DataEntry<string, number>>,
         chargeHistory: [] as Array<DataEntry<string, number>>,
+        energyHistory: [] as Array<DataEntry<string, number>>,
       },
       vehicleData: ref(dataPlaceholder),
       speedHistory: ref([] as Array<DataEntry<string, number>>),
       chargeHistory: ref([] as Array<DataEntry<string, number>>),
+      energyHistory: ref([] as Array<DataEntry<string, number>>),
     };
   },
 
@@ -151,6 +158,9 @@ export default defineComponent({
 
       this.chargeHistory.length = 0;
       this.chargeHistory.push(...this.dirtyData.chargeHistory);
+
+      this.energyHistory.length = 0;
+      this.energyHistory.push(...this.dirtyData.energyHistory);
     },
     getLastTimeStamp(): Date {
       if (this.speedHistory.length < 1) {
@@ -172,11 +182,11 @@ export default defineComponent({
 
   computed: {
     energyUsage(): number {
-      const numHistoryEntries = this.chargeHistory.length;
+      const numHistoryEntries = this.energyHistory.length;
       if (numHistoryEntries < 2) return 0;
 
-      const firstDataPoint = this.chargeHistory[0];
-      const lastDataPoint = this.chargeHistory[numHistoryEntries - 1];
+      const firstDataPoint = this.energyHistory[0];
+      const lastDataPoint = this.energyHistory[numHistoryEntries - 1];
 
       const firstTimeStamp = new Date(firstDataPoint.x);
       const lastTimeStamp = new Date(lastDataPoint.x);
