@@ -111,6 +111,5 @@ export default defineComponent({
 .circular-indicator {
   height: 200px;
   width: 200px;
-  position: relative;
 }
 </style>
