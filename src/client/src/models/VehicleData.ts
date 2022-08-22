@@ -1,7 +1,6 @@
 import GPSCoordinate from "./GPSCoordinate";
-import moment from "moment";
 
-const isValidDate = function (date: any) {
+const isValidDate = function (date: string | number): boolean {
   try {
     new Date(date).toISOString();
     return true;
@@ -12,7 +11,7 @@ const isValidDate = function (date: any) {
 
 export default class VehicleData {
   time: Date;
-  energykWh: number;
+  energykW: number;
   coordinate: GPSCoordinate;
   odometerKm: number;
   speedKmh: number;
@@ -20,14 +19,14 @@ export default class VehicleData {
 
   constructor(
     time: Date,
-    energyKWh: number,
+    energykW: number,
     coordinate: GPSCoordinate,
     odometerKm: number,
     speedKmh: number,
     batteryCharge: number
   ) {
     this.time = time;
-    this.energykWh = energyKWh;
+    this.energykW = energykW;
     this.coordinate = coordinate;
     this.odometerKm = odometerKm;
     this.speedKmh = speedKmh;
@@ -63,6 +62,7 @@ export default class VehicleData {
         throw new Error(`Invalid vehicle data: property ${propName} not set.`);
       }
     });
+
     if (!isValidDate(rawDataObj["time"])) {
       throw new Error(
         `Invalid vehicle data: invalid date ${rawDataObj["time"]}`

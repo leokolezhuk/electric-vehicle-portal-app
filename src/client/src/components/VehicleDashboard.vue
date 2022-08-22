@@ -44,7 +44,7 @@
           <v-row>
             <v-col>
               <OdometerIndicator :value="vehicleData.odometerKm" class="my-4" />
-              <EnergyUseIndicator :value="energyUsage" class="my-4" />
+              <EnergyUseIndicator :value="energyConsumption" class="my-4" />
             </v-col>
           </v-row>
         </v-col>
@@ -161,7 +161,7 @@ export default defineComponent({
           ...data.map((value) => {
             return {
               x: value.time.toISOString(),
-              y: value.energykWh,
+              y: value.energykW,
             };
           })
         );
@@ -176,7 +176,7 @@ export default defineComponent({
       return true;
     },
     getLastTimeStamp(): Date {
-      if (this.speedHistory.length < 1) {
+      if (this.speedHistory.length === 0) {
         return new Date(0);
       }
       const lastTimeStampStr =
@@ -192,7 +192,7 @@ export default defineComponent({
   },
 
   computed: {
-    energyUsage(): number {
+    energyConsumption(): number {
       const numHistoryEntries = this.energyHistory.length;
       if (numHistoryEntries < 2) return 0;
 
@@ -206,9 +206,10 @@ export default defineComponent({
         firstTimeStamp,
         "seconds"
       );
-      const energyDelta = lastDataPoint.y - firstDataPoint.y;
+      const energyDeltakW = lastDataPoint.y - firstDataPoint.y;
 
-      return energyDelta / (secondsDelta / 3600);
+      // Convert seconds delta to hours to get kW/h.
+      return energyDeltakW / (secondsDelta / 3600);
     },
     mapLocation(): google.maps.LatLngLiteral {
       return {
