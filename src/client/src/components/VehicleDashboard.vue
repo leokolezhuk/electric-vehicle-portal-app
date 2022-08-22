@@ -85,10 +85,11 @@ import TimeAreaChart from "@/components/TimeAreaChart.vue";
 import viricityWebSocket from "@/services/viricityWebSocket";
 import DataEntry from "@/models/DataEntry";
 import moment from "moment";
-import { DASHBOARD_UPDATE_EVERY_MS } from "@/config";
 import GPSCoordinate from "@/models/GPSCoordinate";
 import VehicleLocation from "@/components/VehicleLocation.vue";
 import { round } from "lodash";
+
+declare type VehicleInfoHistory = Array<DataEntry<string, number>>;
 
 export default defineComponent({
   name: "VehicleDashboard",
@@ -102,30 +103,9 @@ export default defineComponent({
   },
 
   mounted() {
-    viricityWebSocket.onMessage((data: VehicleData) => {
-      this.dirtyData.vehicleData = data;
-      if (data.time < this.getLastTimeStamp()) {
-        // Hack.
-        // If the received vehicle data is timed before the last stored stamp,
-        // reset history. This should only happen with cyclical test data.
-        this.dirtyData.speedHistory = [];
-        this.dirtyData.chargeHistory = [];
-      }
-      this.dirtyData.speedHistory.push({
-        x: data.time.toISOString(),
-        y: data.speedKmh,
-      });
-      this.dirtyData.chargeHistory.push({
-        x: data.time.toISOString(),
-        y: data.batteryCharge,
-      });
-      this.dirtyData.energyHistory.push({
-        x: data.time.toISOString(),
-        y: data.energykWh,
-      });
+    viricityWebSocket.onUpdate((data: Array<VehicleData>) => {
+      this.update(data);
     });
-
-    setInterval(this.update, DASHBOARD_UPDATE_EVERY_MS);
   },
 
   setup() {
@@ -139,31 +119,61 @@ export default defineComponent({
     );
 
     return {
-      dirtyData: {
-        vehicleData: dataPlaceholder,
-        speedHistory: [] as Array<DataEntry<string, number>>,
-        chargeHistory: [] as Array<DataEntry<string, number>>,
-        energyHistory: [] as Array<DataEntry<string, number>>,
-      },
       vehicleData: ref(dataPlaceholder),
-      speedHistory: ref([] as Array<DataEntry<string, number>>),
-      chargeHistory: ref([] as Array<DataEntry<string, number>>),
-      energyHistory: ref([] as Array<DataEntry<string, number>>),
+      speedHistory: ref([] as VehicleInfoHistory),
+      chargeHistory: ref([] as VehicleInfoHistory),
+      energyHistory: ref([] as VehicleInfoHistory),
     };
   },
 
   methods: {
-    update() {
-      this.vehicleData = this.dirtyData.vehicleData;
+    update(data: Array<VehicleData>) {
+      if (data.length === 0) return;
 
-      this.speedHistory.length = 0;
-      this.speedHistory.push(...this.dirtyData.speedHistory);
+      const lastDataPoint = data[data.length - 1];
+      this.vehicleData = lastDataPoint;
 
-      this.chargeHistory.length = 0;
-      this.chargeHistory.push(...this.dirtyData.chargeHistory);
-
-      this.energyHistory.length = 0;
-      this.energyHistory.push(...this.dirtyData.energyHistory);
+      // Hack.
+      // If the received vehicle data is timed before the last stored stamp,
+      // reset history. This should only happen with cyclical test data.
+      if (!this.isFutureData(data)) {
+        this.speedHistory = [];
+        this.chargeHistory = [];
+        this.energyHistory = [];
+      } else {
+        this.speedHistory.push(
+          ...data.map((value) => {
+            return {
+              x: value.time.toISOString(),
+              y: value.speedKmh,
+            };
+          })
+        );
+        this.chargeHistory.push(
+          ...data.map((value) => {
+            return {
+              x: value.time.toISOString(),
+              y: value.batteryCharge,
+            };
+          })
+        );
+        this.energyHistory.push(
+          ...data.map((value) => {
+            return {
+              x: value.time.toISOString(),
+              y: value.energykWh,
+            };
+          })
+        );
+      }
+    },
+    isFutureData(data: Array<VehicleData>): boolean {
+      for (let entry of data) {
+        if (entry.time < this.getLastTimeStamp()) {
+          return false;
+        }
+      }
+      return true;
     },
     getLastTimeStamp(): Date {
       if (this.speedHistory.length < 1) {

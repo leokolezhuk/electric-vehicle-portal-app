@@ -5,7 +5,7 @@
 <script lang="ts">
 import $Scriptjs from "scriptjs";
 import { GOOGLE_MAPS_API_KEY } from "@/config";
-import { defineComponent, PropType, reactive, ref } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import { mdiBus } from "@mdi/js";
 
 export default defineComponent({

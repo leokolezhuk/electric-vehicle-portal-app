@@ -1,6 +1,23 @@
 import GPSCoordinate from "./GPSCoordinate";
+import moment from "moment";
+
+const isValidDate = function (date: any) {
+  try {
+    new Date(date).toISOString();
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 export default class VehicleData {
+  time: Date;
+  energykWh: number;
+  coordinate: GPSCoordinate;
+  odometerKm: number;
+  speedKmh: number;
+  batteryCharge: number;
+
   constructor(
     time: Date,
     energyKWh: number,
@@ -17,18 +34,11 @@ export default class VehicleData {
     this.batteryCharge = batteryCharge;
   }
 
-  time!: Date;
-  energykWh!: number;
-  coordinate!: GPSCoordinate;
-  odometerKm!: number;
-  speedKmh!: number;
-  batteryCharge!: number;
-
   public static parseJSON(jsonData: string): VehicleData | null {
     try {
       const rawData = JSON.parse(jsonData);
-
       this.validateData(rawData);
+
       const gpsData = rawData.gps.split("|", 2);
 
       return new VehicleData(
@@ -45,7 +55,7 @@ export default class VehicleData {
     }
   }
 
-  private static validateData(rawDataObj: { [x: string]: unknown }) {
+  private static validateData(rawDataObj: { [x: string]: any }) {
     const expectedProps = ["time", "energy", "gps", "odo", "speed", "soc"];
     expectedProps.forEach((propName: string) => {
       const propValue = rawDataObj[propName];
@@ -53,5 +63,10 @@ export default class VehicleData {
         throw new Error(`Invalid vehicle data: property ${propName} not set.`);
       }
     });
+    if (!isValidDate(rawDataObj["time"])) {
+      throw new Error(
+        `Invalid vehicle data: invalid date ${rawDataObj["time"]}`
+      );
+    }
   }
 }
